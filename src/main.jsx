@@ -8,6 +8,7 @@ import Home from './Pages/Home/Home.jsx'
 import Login from './Pages/Login/Login.jsx'
 import Register from './Pages/Register/Register.jsx'
 import Profile from './Pages/Profile/Profile.jsx'
+import ProtectRoutes from './ProtectRoutes.jsx'
 
 
 const router = createBrowserRouter([{
@@ -28,7 +29,7 @@ const router = createBrowserRouter([{
     },
     {
       path:'/profile',
-      element:<Profile/>
+      element:<ProtectRoutes component={<Profile/>}/>
     }
     
   ]

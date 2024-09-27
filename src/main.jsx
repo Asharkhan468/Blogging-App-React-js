@@ -7,6 +7,7 @@ import Login from './Pages/Login/Login.jsx'
 import Register from './Pages/Register/Register.jsx'
 import Profile from './Pages/Profile/Profile.jsx'
 import ProtectRoutes from './ProtectRoutes.jsx'
+import Dashboard from './Pages/Dashboard/Dashboard.jsx'
 
 
 const router = createBrowserRouter([{
@@ -28,6 +29,10 @@ const router = createBrowserRouter([{
     {
       path:'/profile',
       element:<ProtectRoutes component={<Profile/>}/>
+    },
+    {
+      path:'/dashboard',
+      element:<ProtectRoutes component={<Dashboard/>}/>
     }
     
   ]

@@ -2,22 +2,28 @@ import React from 'react'
 import {onAuthStateChanged } from "firebase/auth";
 import { auth , db } from '../config/Firebase/firebaseConfig';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {signOut } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
 
 
 function Navbar() {
+
+
   //Navigate
 
   const navigate = useNavigate();
 
   const [isloggedIn, setisloggedIn] = useState(false);
 
+  //state for store userdata like profile
+
   const [userData , setUserData] = useState(null)
 
- 
+
+
+ //get data from firebase by uid using query
 
   const getData = async (user) => {
     const q = query(collection(db, "user"), where("uid", "==", user.uid));
@@ -25,26 +31,19 @@ function Navbar() {
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
 
-      const image =
-        "https://images.unsplash.com/photo-1727162334483-64741c31f45e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwyNnx8fGVufDB8fHx8fA%3D%3D";
+      const profile = doc.data().profile;
 
-        const userProfile = doc.data().profile;
+      //set the user profile in userdata
 
-      setUserData(userProfile)
+      setUserData(profile)
 
-      
-      
-    
-
-      // console.log(doc.data());
-      
-      
-      
       
     });
   };
 
-  {
+  //check if user login or not by firebase function means usestate
+
+  
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const uid = user.uid;
@@ -57,17 +56,17 @@ function Navbar() {
         return;
       }
     });
-  }
+  
 
   
 
-  //login button functionality
+  //login button functionality which navigate user on login 
 
   const loginButton = () => {
     navigate("/login");
   };
 
-  //logout user
+  //logout user using firebase function signout
 
   const logoutBtn = () => {
     signOut(auth)
@@ -99,10 +98,7 @@ function Navbar() {
                   className="btn btn-ghost btn-circle avatar"
                 >
                   <div className="w-10 rounded-full">
-                    <img
-                      alt="Tailwind CSS Navbar component"
-                      src={userData}
-                    />
+                    <img alt="User Profile" src={userData} />
                   </div>
                 </div>
                 <ul
@@ -116,7 +112,10 @@ function Navbar() {
                     </a>
                   </li>
                   <li>
-                    <p>Settings</p>
+                    <a>
+                      Dashboard
+                      
+                    </a>
                   </li>
                   <li>
                     <p onClick={logoutBtn}>Logout</p>

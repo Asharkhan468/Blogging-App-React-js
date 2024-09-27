@@ -1,10 +1,10 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { collection, addDoc } from "firebase/firestore";
+// import { collection, addDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth , db  } from "../../config/Firebase/firebaseConfig";
-import { uploadBytes } from "firebase/storage";
+import { auth , storage } from "../../config/Firebase/firebaseConfig";
+import {  uploadBytes , ref } from "firebase/storage";
 
 function Register() {
   const {
@@ -17,6 +17,11 @@ function Register() {
   //Navigate
 
   const navigate = useNavigate();
+
+
+   const UserProfileStorageRef = ref(storage, "profile");
+
+  
 
   //Register user to firebase
 
@@ -31,31 +36,55 @@ function Register() {
 
         //user added to firestore
 
-        const UserAddedtoFirestore = async () => {
-           const storageRef = ref(storage, "userprofile");
-          uploadBytes(storageRef, data.file[0])
+        
+        const profile = data.userProfile[0];          
+
+        const UserAddedtoFirestore =  () => {
+
+          console.log(data);
+          
+
+           
+          uploadBytes(UserProfileStorageRef, profile)
           .then((snapshot) => {
             console.log("Uploaded a blob or file!");
           })
           .catch((err) => {
-            console.log(err);
+            console.log('File upload error ===>' , err);
             
           })
-          const docRef = await addDoc(collection(db, "user"), {
-            userName: data.username,
-            email: data.email,
-            uid: user.uid,
 
-          });
-          console.log("Document written with ID: ", docRef.id);
-          
+
+
+  //             getDownloadURL(storageRef)
+  // .then((url) => {
+  //   console.log("URL ==>" , url);
+  //  const setDataInFirebase = async() => {
+  //    const docRef = await addDoc(collection(db, "user"), {
+  //           userName: data.username,
+  //           email: data.email,
+  //           uid: user.uid,
+  //           profile:url
+
+  //         });
+  //         console.log("Document written with ID: ", docRef.id);
+  //  }
+
+  //  setDataInFirebase()
+    
+  // })
+  // .catch((error)=> {
+  //   console.log(error);
+    
+  // })
+           
         };
         UserAddedtoFirestore();
-        console.log(data.image.file[0]);
+        // console.log(data.userProfile.file[0]);
 
-        alert('You have sucessfully Registered!')
+        // alert('You have sucessfully Registered!')
 
-        navigate('/')
+        // navigate('/')
 
     
       })

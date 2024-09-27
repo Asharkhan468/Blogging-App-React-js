@@ -21,6 +21,9 @@ export const db = getFirestore(app);
 // Initialize Cloud Storage and get a reference to the service
 export const storage = getStorage(app);
 
+ 
+
+
 
 
 export default app;

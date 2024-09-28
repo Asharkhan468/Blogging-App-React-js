@@ -23,10 +23,7 @@ function Register() {
   const navigate = useNavigate();
 
 
-  // Reference for the storage
-
-
-   const UserProfileStorageRef = ref(storage, "profile");
+ 
 
   
 
@@ -42,67 +39,59 @@ function Register() {
         const user = userCredential.user;
 
         //create a constant for a profile
-        
-        const profile = data.userProfile[0];          
-        
+
+        const profile = data.userProfile[0];
+
+        // Reference for the storage
+
+        const UserProfileStorageRef = ref(storage, data.userProfile[0].name);
+
         // Added user data to firestore
 
-        const UserAddedtoFirestore =  () => {
-
+        const UserAddedtoFirestore = () => {
           //upload user profile to the storage
-           
+
           uploadBytes(UserProfileStorageRef, profile)
-          .then((snapshot) => {
-            console.log("Uploaded a blob or file!");
+            .then((snapshot) => {
+              console.log("Uploaded a blob or file!");
 
-            // function of getting download URL of uploaded image
+              // function of getting download URL of uploaded image
 
-            getDownloadURL(UserProfileStorageRef)
-            .then((url) => {
-              console.log("URL ==>" , url);
+              getDownloadURL(UserProfileStorageRef)
+                .then((url) => {
+                  console.log("URL ==>", url);
 
-              // set the getting URL and other data to the firestore
+                  // set the getting URL and other data to the firestore
 
-             const setDataInFirebase = async() => {
-               const docRef = await addDoc(collection(db, "user"), {
+                  const setDataInFirebase = async () => {
+                    const docRef = await addDoc(collection(db, "user"), {
                       userName: data.username,
                       email: data.email,
                       uid: user.uid,
-                      profile:url
-
-                    })
+                      profile: url,
+                    });
                     console.log("Document written with ID: ", docRef.id);
-             }
+                  };
 
-             setDataInFirebase()
-
+                  setDataInFirebase();
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
             })
-            .catch((error)=> {
-              console.log(error);
-
-            })
-          })
-          .catch((err) => {
-            console.log('File upload error ===>' , err);
-            
-          })
-
-
-
-         
-           
+            .catch((err) => {
+              console.log("File upload error ===>", err);
+            });
         };
         UserAddedtoFirestore();
 
         //alert user sucess login
 
-        alert('You have sucessfully Registered!')
+        alert("You have sucessfully Registered!");
 
         //navigate to the home page after sucess alert
 
-        navigate('/')
-
-    
+        navigate("/");
       })
       .catch((error) => {
         const errorMessage = error.message;

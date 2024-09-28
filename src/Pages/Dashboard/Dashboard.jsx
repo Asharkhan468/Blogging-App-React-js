@@ -1,4 +1,4 @@
-import React from 'react'
+import React , {useEffect, useState} from 'react'
 import { useForm } from 'react-hook-form';
 import Cards from '../../components/Cards';
 import { addDoc, collection, query, where, getDocs } from "firebase/firestore"; 
@@ -7,7 +7,6 @@ import {onAuthStateChanged } from "firebase/auth";
 
 
 function Dashboard() {
-
   const {
     register,
     handleSubmit,
@@ -15,54 +14,68 @@ function Dashboard() {
     formState: { errors },
   } = useForm();
 
-  const userBlog = (data) =>{
-    console.log(data)
+  //create a state for card data
 
-    
+  const [cardData, setcardData] = useState([]);
 
+  //genrate a date for the user blog
 
-      //use onauth state change for user uid fo only loggedin user blogs
+  const currentDate = new Date();
 
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          const uid = user.uid;
+  const month = currentDate.toLocaleString("default", { month: "long" });
+  const date = currentDate.getDate();
+  const year = currentDate.getFullYear();
 
-           const setData = async () => {
-             const docRef = await addDoc(collection(db, "userblogs"), {
-               title: data.title,
-               description: data.description,
-               uid:uid
-             });
-             console.log("Document written with ID: ", docRef.id);
-           };
+  const userBlog = (data) => {
+    //use onauth state change for user uid fo only loggedin user blogs
 
-           setData();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
 
-          const getData = async() => {
+        const getUserImageAndName = async () => {
+          const q = query(collection(db, "user"), where("uid", "==", uid));
 
-            const q = query(collection(db, "userblogs"), where("uid", "==", uid));
+          const querySnapshot = await getDocs(q);
+          querySnapshot.forEach((doc) => {
+            console.log(doc.id, " => ", doc.data());
+            //store the blog and user image name etc in db
 
-const querySnapshot = await getDocs(q);
-querySnapshot.forEach((doc) => {
-  // doc.data() is never undefined for query doc snapshots
-  console.log(doc.id, " => ", doc.data());
-});
+            const storeBlogToDb = async () => {
+              const docRef = await addDoc(collection(db, "userblogs"), {
+                userName: doc.data().userName,
+                image: doc.data().profile,
+                title: data.title,
+                description: data.description,
+                date: date,
+            
+              });
+              console.log("Document written with ID: ", docRef.id);
+            };
 
+            storeBlogToDb();
 
-          }
+            //get the above stored data from firestore
 
-          getData()
+            const getStoredData = async () => {
+              const querySnapshot = await getDocs(collection(db, "userblogs"));
+              querySnapshot.forEach((doc) => {
+                // doc.data() is never undefined for query doc snapshots
+                setcardData([doc.data() , ...cardData]);
+                console.log(cardData);
+                
+              });
+            };
+            getStoredData();
+          });
+        };
 
-          return
-        }
-        
-      });
+        getUserImageAndName();
 
-
-    
-    
-  } 
-
+        return;
+      }
+    });
+  };
 
   return (
     <>
@@ -100,12 +113,17 @@ querySnapshot.forEach((doc) => {
         </div>
       </form>
 
+      <h1 className="text-2xl text-center font-bold mt-[7rem]">My Blogs</h1>
 
-      <h1 className='text-2xl text-center font-bold mt-[7rem]'>My Blogs</h1>
+     {
+      cardData.length!=0 ? cardData.map((item) => {
+        return(
+          <div>
+            <Cards title={item.title} description={item.description} image={item.image} username={item.userName}/>
+          </div>
+        )
 
-      <div className='mt-4'>
-        <Cards />
-      </div>
+      }):<h1>No Blog upload</h1>     }
     </>
   );
 }

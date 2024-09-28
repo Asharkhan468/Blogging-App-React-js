@@ -83,9 +83,9 @@ function Navbar() {
     <>
       <div className="navbar bg-primary">
         <div className="flex-1">
-          <a className="btn btn-ghost text-xl text-white">
+          <Link className="btn btn-ghost text-xl text-white">
             Personal Blogging App
-          </a>
+          </Link>
         </div>
 
         <div className="flex-none">

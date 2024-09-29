@@ -5,6 +5,7 @@ import Cards from "../../components/Cards";
 import { addDoc, collection, query, where, getDocs , deleteDoc } from "firebase/firestore";
 import { db, auth } from "../../config/Firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
+import SucessAlert from "../../components/SucessAlert";
 
 function Dashboard() {
   const {
@@ -58,6 +59,10 @@ function Dashboard() {
               });
               console.log("Document written with ID: ", docRef.id);
 
+              <SucessAlert/>
+              
+
+             
               
             };
 

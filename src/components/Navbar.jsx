@@ -2,7 +2,7 @@ import React from 'react'
 import {onAuthStateChanged } from "firebase/auth";
 import { auth , db } from '../config/Firebase/firebaseConfig';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {signOut } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
@@ -83,7 +83,7 @@ function Navbar() {
     <>
       <div className="navbar bg-primary">
         <div className="flex-1">
-          <Link className="btn btn-ghost text-xl text-white">
+          <Link to='/' className="btn btn-ghost text-xl text-white">
             Personal Blogging App
           </Link>
         </div>
@@ -106,10 +106,10 @@ function Navbar() {
                   className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
                 >
                   <li>
-                    <a className="justify-between">
+                    <Link to={'singleblog'} className="justify-between">
                       Profile
                       <span className="badge">New</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a>

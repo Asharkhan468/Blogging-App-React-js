@@ -2,10 +2,17 @@ import React, { useEffect, useState } from 'react'
 import Cards from '../../components/Cards'
 import { collection, getDocs } from "firebase/firestore";
 import { db } from '../../config/Firebase/firebaseConfig';
+import { json, useNavigate } from 'react-router-dom';
 
 function Home() {
 
   const [homeCardData , setHomeCardData] = useState([]);
+
+  //navigate 
+
+  const navigate = useNavigate()
+
+ 
 
   //get data from the firebase
 
@@ -27,6 +34,19 @@ function Home() {
     getData()
 
   } , [])
+
+
+   const singleBlog = (index) => {
+     console.log("single blog clicked", index);
+     console.log(homeCardData[index]);
+     
+     let storeSingleBlogToLocalStore=[];
+
+     storeSingleBlogToLocalStore.push(homeCardData[index])
+     localStorage.setItem('userSingleBlog' , JSON.stringify(storeSingleBlogToLocalStore))
+    //  navigate("/singleBlog");
+     
+   };
 
 
 
@@ -53,7 +73,7 @@ function Home() {
       homeCardData ? homeCardData.map((item , index) => {
         return(
           <div className='mt-3' key={index}>
-          <Cards title={item.title} description={item.description} date={'September, 12,2024'} username={'Ashar khan'} button1={'See All From This User'}/>
+          <Cards title={item.title} description={item.description} date={item.date} username={item.userName} image={item.image} onButtonClick={() => singleBlog(index)} button={'All From This User'}/>
           </div>
         )
       }):<h1 className='text-5xl'>Loading...</h1>

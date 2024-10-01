@@ -38,8 +38,9 @@ const router = createBrowserRouter([
       },
       {
         path:'/singleblog',
-        element:<SingleBlog/>
-      }
+        element:<ProtectRoutes component={<SingleBlog/>}/>
+      },
+      
      
     ],
   },

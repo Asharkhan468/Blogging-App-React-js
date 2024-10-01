@@ -99,23 +99,27 @@ function SingleBlog() {
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHaaCIKM5nWOuJsfYmYKK0YsuVsdZ2s-1eqQ&s"
             className="w-24 h-24 rounded-full mb-4"
           />
-          <h2 className="text-2xl font-bold text-gray-800">
-            Ashar
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800">Ashar</h2>
           {/* <p className="text-gray-600">cmcmcmcmmc</p> */}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl">
-          {userBlog.map((item, index) => (
-            <Cards
-              key={index}
-              title={item.title}
-              description={item.description}
-              image={item.image}
-              username={item.userName}
-              date={item.date}
-            />
-          ))}
+          {userBlog.length != 0 ? (
+            userBlog.map((item, index) => (
+              <Cards
+                key={index}
+                title={item.title}
+                description={item.description}
+                image={item.image}
+                username={item.userName}
+                date={item.date}
+              />
+            ))
+          ) : (
+            <div className="text-center m-[20vh] flex justify-center">
+              <span className="loading loading-spinner text-warning loading-lg"></span>
+            </div>
+          )}
         </div>
       </div>
     </>

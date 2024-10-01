@@ -2,7 +2,16 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Cards from "../../components/Cards";
-import { addDoc, collection, query, where, getDocs , deleteDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db, auth } from "../../config/Firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import SucessAlert from "../../components/SucessAlert";
@@ -30,7 +39,7 @@ function Dashboard() {
         const uid = user.uid;
         const q = query(collection(db, "userblogs"), where("uid", "==", uid));
         const querySnapshot = await getDocs(q);
-        const newData = querySnapshot.docs.map((doc) => doc.data());
+        const newData = querySnapshot.docs.map((doc) => ({...doc.data() , id: doc.id}));
         setCardData(newData);
       }
     });
@@ -56,6 +65,7 @@ function Dashboard() {
                 userName: doc.data().userName,
                 date: blogDate,
                 uid: uid,
+                
               });
               console.log("Document written with ID: ", docRef.id);
 
@@ -89,20 +99,110 @@ function Dashboard() {
     });
   };
 
-  // const editBtn = () => {
-  //   console.log('edit button clicked!');
-    
-  // }
-
+ 
   const deleteBtn = async(index) => {
     console.log('delete button clicked!' , index);
 
-    console.log(cardData[index]);
+    console.log(cardData[index].id);
+
+    const deleteDataFromFirestore = async() => {
+      await deleteDoc(doc(db, "userblogs", cardData[index].id ));
+    }
+
+    deleteDataFromFirestore()
 
   
 
 
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  //edit blog
+
+//   const EditForm = () => {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const [formData, setFormData] = useState({ title: '', description: '' });
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData({ ...formData, [name]: value });
+//   };
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     // Handle form submission logic here
+//     console.log('Form submitted:', formData);
+//     setIsOpen(false); // Close the form after submission
+//   }
+// }
+
+
+ 
+
 
   
    
@@ -146,10 +246,14 @@ function Dashboard() {
         </div>
       </form>
 
+      
+
       <h1 className="text-2xl text-center font-bold mt-[7rem]">My Blogs</h1>
 
-      {cardData.length != 0 ? (
-        cardData.map((item , index) => {
+      
+
+      {cardData ? (
+        cardData.map((item, index) => {
           return (
             <div key={index} className="mt-5">
               <Cards
@@ -159,15 +263,19 @@ function Dashboard() {
                 username={item.userName}
                 date={item.date}
                 editBtn={"Edit"}
-                deleteBtn={'Delete'}
+                deleteBtn={'delete'}
+              
                 // onEditBtn={editBtn}
                 onDeleteBtn={() => deleteBtn(index)}
+                onEditBtn={() => editBtn(index)}
               />
             </div>
           );
         })
       ) : (
-        <h1 className="text-center font-bold text-lg mt-9">No Blog uploaded</h1>
+        <div className="text-center m-[20vh]">
+          <span className="loading loading-spinner text-warning loading-lg"></span>
+        </div>
       )}
     </>
   );

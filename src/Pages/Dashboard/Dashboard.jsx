@@ -14,7 +14,8 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../../config/Firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
-import SucessAlert from "../../components/SucessAlert";
+
+
 
 function Dashboard() {
   const {
@@ -23,6 +24,10 @@ function Dashboard() {
     watch,
     formState: { errors },
   } = useForm();
+
+  //button text in a state
+
+  const [buttonText, setButtonText] = useState(" Publish Blog");
 
   const currentDate = new Date();
   const month = currentDate.toLocaleString("default", { month: "long" });
@@ -39,21 +44,26 @@ function Dashboard() {
         const uid = user.uid;
         const q = query(collection(db, "userblogs"), where("uid", "==", uid));
         const querySnapshot = await getDocs(q);
-        const newData = querySnapshot.docs.map((doc) => ({...doc.data() , id: doc.id}));
+        const newData = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
         setCardData(newData);
       }
     });
   }, []);
 
   const userBlog = (data) => {
+    setButtonText(
+      <span className="loading loading-spinner text-warning loading-md"></span>
+    );
+
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const uid = user.uid;
 
         const getUserImageName = async () => {
           const q = query(collection(db, "user"), where("uid", "==", uid));
-
-         
 
           const querySnapshot = await getDocs(q);
           querySnapshot.forEach((doc) => {
@@ -65,15 +75,8 @@ function Dashboard() {
                 userName: doc.data().userName,
                 date: blogDate,
                 uid: uid,
-                
               });
               console.log("Document written with ID: ", docRef.id);
-
-              <SucessAlert/>
-              
-
-             
-              
             };
 
             setUserBlogInFirestore();
@@ -88,6 +91,7 @@ function Dashboard() {
               const newData = querySnapshot.docs.map((doc) => doc.data());
               setCardData(newData);
               console.log(cardData);
+              setButtonText(" Publish Blog");
             };
 
             getData();
@@ -99,116 +103,44 @@ function Dashboard() {
     });
   };
 
- 
-  const deleteBtn = async(index) => {
-    console.log('delete button clicked!' , index);
+  const deleteBtn = async (index) => {
+    console.log("delete button clicked!", index);
 
     console.log(cardData[index].id);
 
-    const deleteDataFromFirestore = async() => {
-      await deleteDoc(doc(db, "userblogs", cardData[index].id ));
-    }
+    const deleteDataFromFirestore = async () => {
+      await deleteDoc(doc(db, "userblogs", cardData[index].id));
+    };
 
-    deleteDataFromFirestore()
+    deleteDataFromFirestore();
+
+    alert('Blog deleted sucessfully!')
+  };
+
+  //edit blog
 
   
+
+  const editBtn = async(index) => {
+
+    const editedTitle = prompt("Enter updated title");
+    const editedDescription = prompt("Enter description");
+
+
+    const washingtonRef = doc(db, "userblogs", cardData[index].id);
+    await updateDoc(washingtonRef, {
+  title: editedTitle,
+  description: editedDescription
+});
+
+alert('Blog updated sucessfully!')
 
 
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  //edit blog
-
-//   const EditForm = () => {
-//   const [isOpen, setIsOpen] = useState(false);
-//   const [formData, setFormData] = useState({ title: '', description: '' });
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData({ ...formData, [name]: value });
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     // Handle form submission logic here
-//     console.log('Form submitted:', formData);
-//     setIsOpen(false); // Close the form after submission
-//   }
-// }
-
-
  
 
-
-  
-   
-  
-
-  
 
   return (
     <>
@@ -241,16 +173,12 @@ function Dashboard() {
 
         <div className="mt-4 flex justify-center lg:justify-start">
           <button className="btn btn-primary text-white w-full sm:w-auto px-6 py-3 text-sm sm:text-base lg:text-lg">
-            Publish Blog
+            {buttonText}
           </button>
         </div>
       </form>
 
-      
-
       <h1 className="text-2xl text-center font-bold mt-[7rem]">My Blogs</h1>
-
-      
 
       {cardData ? (
         cardData.map((item, index) => {
@@ -263,8 +191,7 @@ function Dashboard() {
                 username={item.userName}
                 date={item.date}
                 editBtn={"Edit"}
-                deleteBtn={'delete'}
-              
+                deleteBtn={"delete"}
                 // onEditBtn={editBtn}
                 onDeleteBtn={() => deleteBtn(index)}
                 onEditBtn={() => editBtn(index)}
@@ -282,6 +209,141 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

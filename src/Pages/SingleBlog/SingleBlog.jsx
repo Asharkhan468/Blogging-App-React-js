@@ -60,10 +60,16 @@ import Cards from "../../components/Cards";
 
 function SingleBlog() {
   const getData = JSON.parse(localStorage.getItem("userSingleBlog"));
+  const profile = getData[0].image;
   const uid = getData[0].uid;
+
+  //user image and email
+
 
   const [userBlog, setUserBlog] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  
 
   useEffect(() => {
     const storedUserBlog = localStorage.getItem("userBlog");
@@ -86,22 +92,18 @@ function SingleBlog() {
     setLoading(false);
   };
 
-
-  
-
-
   return (
     <>
-      <div className="flex flex-col items-center p-6 space-y-6 bg-gray-100 min-h-screen">
+      {/* <div className="flex flex-col items-center p-6 space-y-6 bg-gray-100 min-h-screen">
         {/* User Profile Section */}
-        <div className="flex flex-col items-center bg-white p-6 shadow-lg rounded-lg w-full max-w-sm">
+      {/* <div className="flex flex-col items-center bg-white p-6 shadow-lg rounded-lg w-full max-w-sm">
           <img
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHaaCIKM5nWOuJsfYmYKK0YsuVsdZ2s-1eqQ&s"
             className="w-24 h-24 rounded-full mb-4"
           />
           <h2 className="text-2xl font-bold text-gray-800">Ashar</h2>
           {/* <p className="text-gray-600">cmcmcmcmmc</p> */}
-        </div>
+      {/* </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl">
           {userBlog.length != 0 ? (
@@ -118,7 +120,51 @@ function SingleBlog() {
           ) : (
             <div className="text-center m-[20vh] flex justify-center">
               <span className="loading loading-spinner text-warning loading-lg"></span>
+            </div> */}
+      {/* )}
+        </div>
+      </div>   */}
+
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
+        {/* Profile Section */}
+        <div className="bg-white shadow-lg rounded-lg w-full max-w-md p-6 mb-8 text-center">
+          <div className="flex justify-center">
+            <img
+              src={getData[0].image}
+              alt="User Profile"
+              className="w-32 h-32 rounded-full border-4 border-indigo-500"
+            />
+          </div>
+          <h2 className="text-2xl font-bold mt-4">{getData[0].userName}</h2>
+         
+        </div>
+
+        {/* User Posts */}
+
+        <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+           Posts
+        </h3>
+
+        <div className="flex justify-center w-full md:w-3/2 md:ml-6 gap-3 flex-wrap">
+          {loading ? (
+            <div className="text-center my-10">
+              <span className="loading loading-spinner text-warning loading-lg"></span>
             </div>
+          ) : userBlog.length !== 0 ? (
+            userBlog.map((item, index) => {
+              return (
+                <Cards
+                  key={index}
+                  image={item.image}
+                  title={item.title}
+                  description={item.description}
+                  date={item.date}
+                  username={item.userName}
+                />
+              );
+            })
+          ) : (
+            <h1>No post found...</h1>
           )}
         </div>
       </div>

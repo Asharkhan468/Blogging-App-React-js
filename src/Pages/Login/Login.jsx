@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth , db } from '../../config/Firebase/firebaseConfig';
 import { collection, query, where, getDocs } from "firebase/firestore";
+
+
 
 
 
@@ -17,11 +19,19 @@ function Login() {
     formState: { errors },
   } = useForm();
 
+  //loading
+
+  const [loading, setLoading] = useState("LOGIN");
+
   //navigate
 
   const navigate = useNavigate();
 
   const loginUserFromFirebase = (data) => {
+
+    setLoading(
+      <span className="loading loading-spinner text-primary loading-lg"></span>
+    );
 
 
     //login user from firebase
@@ -51,6 +61,9 @@ querySnapshot.forEach((doc) => {
       .catch((error) => {
         const errorMessage = error.message;
         alert(errorMessage)
+        setLoading('LOGIN')
+      
+       
       });
     
   };
@@ -112,7 +125,7 @@ querySnapshot.forEach((doc) => {
             type="submit"
             className="btn btn-warning w-[19rem] mt-4 sm:w-[25rem] md:w-[25rem] lg:w-[25rem]"
           >
-            LOGIN
+           {loading}
           </button>
         </div>
       </form>

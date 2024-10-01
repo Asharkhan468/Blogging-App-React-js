@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
@@ -18,6 +18,8 @@ function Register() {
     formState: { errors },
   } = useForm();
 
+  const [loading , setLoading] = useState('REGISTER')
+
   //Navigate
 
   const navigate = useNavigate();
@@ -30,6 +32,10 @@ function Register() {
   //Register user to firebase
 
   const RegisterUserToFirebase = (data) => {
+    setLoading(
+      <span className="loading loading-spinner text-primary loading-lg"></span>
+    );
+
     console.log(data);
 
     //create user with email password
@@ -50,6 +56,8 @@ function Register() {
 
         const UserAddedtoFirestore = () => {
           //upload user profile to the storage
+
+          
 
           uploadBytes(UserProfileStorageRef, profile)
             .then((snapshot) => {
@@ -97,6 +105,7 @@ function Register() {
         const errorMessage = error.message;
 
         alert(errorMessage)
+        setLoading('REGISTER')
       });
   };
 
@@ -181,7 +190,7 @@ function Register() {
             type="submit"
             className="btn btn-warning w-[19rem] mt-4 sm:w-[25rem] md:w-[25rem] lg:w-[25rem]"
           >
-            REGISTER
+            {loading}
           </button>
         </div>
       </form>

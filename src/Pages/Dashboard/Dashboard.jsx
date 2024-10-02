@@ -25,6 +25,10 @@ function Dashboard() {
     formState: { errors },
   } = useForm();
 
+  //user uid
+
+  const [userUid , setUserUid] = useState(null)
+
   //button text in a state
 
   const [buttonText, setButtonText] = useState(" Publish Blog");
@@ -42,6 +46,7 @@ function Dashboard() {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const uid = user.uid;
+        setUserUid(uid);
         const q = query(collection(db, "userblogs"), where("uid", "==", uid));
         const querySnapshot = await getDocs(q);
         const newData = querySnapshot.docs.map((doc) => ({
@@ -51,7 +56,7 @@ function Dashboard() {
         setCardData(newData);
       }
     });
-  }, []);
+  }, [cardData]);
 
   const userBlog = (data) => {
     setButtonText(
@@ -103,17 +108,47 @@ function Dashboard() {
     });
   };
 
+
+  // get updated data
+
+ const getUpdatedData = async () => {
+
+   const q = query(
+                collection(db, "userblogs"),
+                where("uid", "==", userUid)
+              );
+
+              const querySnapshot = await getDocs(q);
+              const newData = querySnapshot.docs.map((doc) => doc.data());
+              setCardData(newData);
+
+ }
+
+  
+
+
+
   const deleteBtn = async (index) => {
     console.log("delete button clicked!", index);
 
     console.log(cardData[index].id);
 
+   
+
     const deleteDataFromFirestore = async () => {
       await deleteDoc(doc(db, "userblogs", cardData[index].id));
+      
     };
-
+    
+    
+    
+    
+    
+    
+    
+    getUpdatedData()
     deleteDataFromFirestore();
-
+    
     alert('Blog deleted sucessfully!')
   };
 
@@ -132,6 +167,8 @@ function Dashboard() {
   title: editedTitle,
   description: editedDescription
 });
+
+getUpdatedData()
 
 alert('Blog updated sucessfully!')
 
@@ -200,9 +237,7 @@ alert('Blog updated sucessfully!')
           );
         })
       ) : (
-        <div className="text-center m-[20vh]">
-          <span className="loading loading-spinner text-warning loading-lg"></span>
-        </div>
+        <h1 className="text-black">No Blog Uploaded</h1>
       )}
     </>
   );

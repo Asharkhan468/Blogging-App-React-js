@@ -127,7 +127,7 @@ function SingleBlog() {
 
       <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
         {/* Profile Section */}
-        <div className="bg-white shadow-lg rounded-lg w-full max-w-md p-6 mb-8 text-center">
+        <div className="bg-white shadow-lg rounded-lg w-full max-w-xl p-6 mb-8 text-center">
           <div className="flex justify-center">
             <img
               src={getData[0].image}

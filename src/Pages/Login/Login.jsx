@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth , db } from '../../config/Firebase/firebaseConfig';
 import { collection, query, where, getDocs } from "firebase/firestore";
-
+import SuccessAlert from '../../components/SucessAlert';
 
 
 
@@ -18,6 +18,11 @@ function Login() {
     watch,
     formState: { errors },
   } = useForm();
+
+  //sucess modal state
+
+    const [loggedIn, setLoggedIn] = useState(false);
+
 
   //loading
 
@@ -40,6 +45,13 @@ function Login() {
       .then((userCredential) => {
         const user = userCredential.user;
         console.log(user);
+        setLoggedIn(true);
+
+        <SuccessAlert
+          message="Logged in Successfully!"
+          visible={loggedIn}
+          onClose={() => setLoggedIn(false)} // Reset state after alert closes
+        />;
 
       const getData = async () => {
         const q = query(collection(db, "user"), where("uid", "==", user.uid));
@@ -47,6 +59,13 @@ function Login() {
 const querySnapshot = await getDocs(q);
 querySnapshot.forEach((doc) => {
   console.log(doc.id, " => ", doc.data());
+
+  // logedIn sucessfully pop up modal
+
+  
+
+ 
+ 
   navigate('/')
 });
       }

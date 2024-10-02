@@ -91,38 +91,6 @@ Greeting()
 
   return (
     <>
-      {/* <div className="mt-4">
-        <h1 className="text-3xl font-semibold text-center">{greeting}</h1>
-      </div>
-
-      <div className="mt-[40px]">
-        <h1 className="text-2xl font-bold text-center">All Blogs</h1>
-      </div>
-
-      <div className="mt-5">
-        {homeCardData.length != 0 ? (
-          homeCardData.map((item, index) => {
-            return (
-              <div className="mt-3" key={index}>
-                <Cards
-                  title={item.title}
-                  description={item.description}
-                  date={item.date}
-                  username={item.userName}
-                  image={item.image}
-                  onButtonClick={() => singleBlog(index)}
-                  button={"All From This User"}
-                />
-              </div>
-            );
-          })
-        ) : (
-          <div className="text-center m-[20vh]">
-            <span className="loading loading-spinner text-warning loading-lg"></span>
-          </div>
-        )}
-      </div> */}
-
       <div className="mt-4 px-4 md:px-8 lg:px-16">
         <h1 className="text-2xl font-semibold text-center">{greeting}</h1>
       </div>
@@ -143,7 +111,7 @@ Greeting()
                   username={item.userName}
                   image={item.image}
                   onButtonClick={() => singleBlog(index)}
-                  button={"All From This User"}
+                  button={"See All From This User"}
                 />
               </div>
             ))}

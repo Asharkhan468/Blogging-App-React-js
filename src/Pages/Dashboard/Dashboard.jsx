@@ -24,7 +24,7 @@
 
 //   // User UID
 //   const [userUid, setUserUid] = useState(null);
-//   const [buttonText, setButtonText] = useState(" Publish Blog");
+//   const [buttonText, setButtonText] = useState("Publish Blog");
 //   const currentDate = new Date();
 //   const month = currentDate.toLocaleString("default", { month: "long" });
 //   const date = currentDate.getDate();
@@ -36,7 +36,7 @@
 //   const [currentEditIndex, setCurrentEditIndex] = useState(null);
 
 //   useEffect(() => {
-//     onAuthStateChanged(auth, async (user) => {
+//     const unsubscribe = onAuthStateChanged(auth, async (user) => {
 //       if (user) {
 //         const uid = user.uid;
 //         setUserUid(uid);
@@ -49,49 +49,34 @@
 //         setCardData(newData);
 //       }
 //     });
+
+//     return () => unsubscribe(); // Cleanup subscription
 //   }, [cardData]);
 
-//   const userBlog = (data) => {
+//   const userBlog = async (data) => {
 //     setButtonText(
 //       <span className="loading loading-spinner text-warning loading-md"></span>
 //     );
 
-//     onAuthStateChanged(auth, (user) => {
+//     onAuthStateChanged(auth, async (user) => {
 //       if (user) {
 //         const uid = user.uid;
 
 //         const getUserImageName = async () => {
 //           const q = query(collection(db, "user"), where("uid", "==", uid));
-
 //           const querySnapshot = await getDocs(q);
-//           querySnapshot.forEach((doc) => {
-//             const setUserBlogInFirestore = async () => {
-//               const docRef = await addDoc(collection(db, "userblogs"), {
-//                 title: data.title,
-//                 description: data.description,
-//                 image: doc.data().profile,
-//                 userName: doc.data().userName,
-//                 date: blogDate,
-//                 uid: uid,
-//               });
-//               console.log("Document written with ID: ", docRef.id);
-//             };
-
-//             setUserBlogInFirestore();
-
-//             const getData = async () => {
-//               const q = query(
-//                 collection(db, "userblogs"),
-//                 where("uid", "==", uid)
-//               );
-//               const querySnapshot = await getDocs(q);
-//               const newData = querySnapshot.docs.map((doc) => doc.data());
-//               setCardData(newData);
-//               data.title = "";
-//               setButtonText(" Publish Blog");
-//             };
-
-//             getData();
+//           querySnapshot.forEach(async (doc) => {
+//             await addDoc(collection(db, "userblogs"), {
+//               title: data.title,
+//               description: data.description,
+//               image: doc.data().profile,
+//               userName: doc.data().userName,
+//               date: blogDate,
+//               uid: uid,
+//             });
+//             await getUpdatedData();
+//             data.title = ""; // Reset title
+//             setButtonText("Publish Blog");
 //           });
 //         };
 
@@ -109,19 +94,10 @@
 //   };
 
 //   const deleteBtn = async (index) => {
-//     console.log("delete button clicked!", index);
-//     console.log(cardData[index].id);
-
-//     const deleteDataFromFirestore = async () => {
-//       await deleteDoc(doc(db, "userblogs", cardData[index].id));
-//     };
-
-//     deleteDataFromFirestore();
-//     getUpdatedData();
+//     await deleteDoc(doc(db, "userblogs", cardData[index].id));
 //     alert("Blog deleted successfully!");
 //   };
 
-//   // Edit blog
 //   const editBtn = async (index) => {
 //     setEditData({
 //       title: cardData[index].title,
@@ -138,7 +114,7 @@
 //       description: editData.description,
 //     });
 
-//     getUpdatedData();
+//     await getUpdatedData();
 //     setIsEditing(false);
 //     alert("Blog updated successfully!");
 //   };
@@ -157,7 +133,6 @@
 //           placeholder="Enter a title..."
 //           className="input input-bordered text-base md:text-lg w-full mb-4"
 //         />
-//         <br />
 //         {errors.title && (
 //           <span className="text-red-600">This field is required</span>
 //         )}
@@ -178,32 +153,34 @@
 //         </div>
 //       </form>
 
-//       <h1 className="text-2xl text-center font-bold mt-[7rem]">My Blogs</h1>
+//       <h1 className="text-2xl text-center font-bold mt-10">My Blogs</h1>
 
-//       {cardData.length > 0 ? (
-//         cardData.map((item, index) => (
-//           <div key={index} className="mt-5">
-//             <Cards
-//               title={item.title}
-//               description={item.description}
-//               image={item.image}
-//               username={item.userName}
-//               date={item.date}
-//               editBtn="Edit"
-//               deleteBtn="Delete"
-//               onDeleteBtn={() => deleteBtn(index)}
-//               onEditBtn={() => editBtn(index)}
-//             />
-//           </div>
-//         ))
-//       ) : (
-//         <h1 className="text-black">No Blog Uploaded</h1>
-//       )}
+//       <div className="flex flex-wrap justify-center mt-5">
+//         {cardData.length > 0 ? (
+//           cardData.map((item, index) => (
+//             <div key={index} className="mt-5 mx-2 sm:mx-4 lg:mx-6">
+//               <Cards
+//                 title={item.title}
+//                 description={item.description}
+//                 image={item.image}
+//                 username={item.userName}
+//                 date={item.date}
+//                 editBtn="Edit"
+//                 deleteBtn="Delete"
+//                 onDeleteBtn={() => deleteBtn(index)}
+//                 onEditBtn={() => editBtn(index)}
+//               />
+//             </div>
+//           ))
+//         ) : (
+//           <h1 className="text-black">No Blog Uploaded</h1>
+//         )}
+//       </div>
 
 //       {/* Edit Modal */}
 //       {isEditing && (
-//         <div className="fixed inset-0 flex items-center justify-center z-50 m-[30vh]">
-//           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+//         <div className="fixed inset-0 flex items-center justify-center z-50">
+//           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4 sm:mx-auto">
 //             <h2 className="text-xl font-bold mb-4">Edit Blog</h2>
 //             <input
 //               type="text"
@@ -295,102 +272,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Cards from "../../components/Cards";
@@ -427,6 +308,8 @@ function Dashboard() {
   const [editData, setEditData] = useState({ title: "", description: "" });
   const [isEditing, setIsEditing] = useState(false);
   const [currentEditIndex, setCurrentEditIndex] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(""); // New state for success message
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // State to control modal visibility
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -444,7 +327,7 @@ function Dashboard() {
     });
 
     return () => unsubscribe(); // Cleanup subscription
-  }, []);
+  }, [cardData]);
 
   const userBlog = async (data) => {
     setButtonText(
@@ -468,6 +351,8 @@ function Dashboard() {
               uid: uid,
             });
             await getUpdatedData();
+            setSuccessMessage("Your Blog Published Successfully!"); // Set success message
+            setIsSuccessModalOpen(true); // Open modal
             data.title = ""; // Reset title
             setButtonText("Publish Blog");
           });
@@ -488,8 +373,9 @@ function Dashboard() {
 
   const deleteBtn = async (index) => {
     await deleteDoc(doc(db, "userblogs", cardData[index].id));
+    setSuccessMessage("Your Blog Deleted Successfully!"); // Set success message
+    setIsSuccessModalOpen(true); // Open modal
     await getUpdatedData();
-    alert("Blog deleted successfully!");
   };
 
   const editBtn = async (index) => {
@@ -510,7 +396,13 @@ function Dashboard() {
 
     await getUpdatedData();
     setIsEditing(false);
-    alert("Blog updated successfully!");
+    setSuccessMessage("Your Blog Updated Successfully!"); // Set success message
+    setIsSuccessModalOpen(true); // Open modal
+  };
+
+  const closeModal = () => {
+    setIsSuccessModalOpen(false); // Close modal
+    setSuccessMessage(""); // Clear message
   };
 
   return (
@@ -571,10 +463,30 @@ function Dashboard() {
         )}
       </div>
 
+      {/* Success Modal */}
+      {isSuccessModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4 sm:mx-auto border border-black">
+            <h2 className="text-lg font-bold text-center text-green-600 mb-4">
+              Success!
+            </h2>
+            <p className="text-center text-gray-700 mb-4 font-semibold">{successMessage}</p>
+            <div className="flex justify-center">
+              <button
+                onClick={closeModal}
+                className="btn btn-primary text-white px-4 py-2 rounded-lg"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Edit Modal */}
       {isEditing && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4 sm:mx-auto">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4 sm:mx-auto border border-1">
             <h2 className="text-xl font-bold mb-4">Edit Blog</h2>
             <input
               type="text"
@@ -596,13 +508,13 @@ function Dashboard() {
             <div className="flex justify-between">
               <button
                 onClick={handleUpdate}
-                className="btn btn-primary text-white"
+                className="btn btn-primary text-white px-4 py-2 rounded-lg"
               >
-                Save
+                Update
               </button>
               <button
                 onClick={() => setIsEditing(false)}
-                className="btn btn-secondary text-white"
+                className="btn btn-secondary text-white px-4 py-2 rounded-lg"
               >
                 Cancel
               </button>
@@ -615,6 +527,97 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -46,8 +46,8 @@ function Login() {
             // Navigate after successful login
             setTimeout(() => {
               setShowPopup(false); // Hide pop-up after delay
-              navigate("/");
             }, 2000); // Wait for 2 seconds before redirecting
+            navigate("/");
           });
         };
         getData();

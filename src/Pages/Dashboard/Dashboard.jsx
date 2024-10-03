@@ -293,6 +293,7 @@ function Dashboard() {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm();
 
@@ -353,7 +354,7 @@ function Dashboard() {
             await getUpdatedData();
             setSuccessMessage("Your Blog Published Successfully!"); // Set success message
             setIsSuccessModalOpen(true); // Open modal
-            data.title = ""; // Reset title
+           reset()
             setButtonText("Publish Blog");
           });
         };

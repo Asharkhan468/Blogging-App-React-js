@@ -61,6 +61,7 @@ function Register() {
                       email: data.email,
                       uid: user.uid,
                       profile: url,
+                    
                     });
                     setSuccessPopup(true); // Show the success pop-up
                     setTimeout(() => {

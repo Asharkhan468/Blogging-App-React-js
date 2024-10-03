@@ -5,7 +5,30 @@ import { collection, addDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, storage, db } from "../../config/Firebase/firebaseConfig";
 import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
-import Alert from "../../components/Alert";
+
+// Error Pop-up Component
+function ErrorPopup({ show, onClose }) {
+  if (!show) return null;
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+        <h2 className="text-xl font-bold text-red-600 mb-4">
+          Invalid Credentials
+        </h2>
+        <p className="text-lg">
+          Please check your email or password and try again.
+        </p>
+        <button
+          onClick={onClose}
+          className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
 
 // Success Pop-up Component
 function SuccessPopup({ show, onClose }) {
@@ -33,9 +56,9 @@ function Register() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-
   const [loading, setLoading] = useState("REGISTER");
-  const [successPopup, setSuccessPopup] = useState(false); // State for pop-up
+  const [successPopup, setSuccessPopup] = useState(false);
+  const [errorPopup, setErrorPopup] = useState(false); // State for error pop-up
   const navigate = useNavigate();
 
   const RegisterUserToFirebase = (data) => {
@@ -52,7 +75,7 @@ function Register() {
 
         const UserAddedtoFirestore = () => {
           uploadBytes(UserProfileStorageRef, profile)
-            .then((snapshot) => {
+            .then(() => {
               getDownloadURL(UserProfileStorageRef)
                 .then((url) => {
                   const setDataInFirebase = async () => {
@@ -61,7 +84,6 @@ function Register() {
                       email: data.email,
                       uid: user.uid,
                       profile: url,
-                    
                     });
                     setSuccessPopup(true); // Show the success pop-up
                     setTimeout(() => {
@@ -82,6 +104,7 @@ function Register() {
       })
       .catch((error) => {
         setLoading("REGISTER");
+        setErrorPopup(true); // Show the error pop-up when registration fails
       });
   };
 
@@ -92,13 +115,6 @@ function Register() {
       </div>
       <form onSubmit={handleSubmit(RegisterUserToFirebase)}>
         <label className="input input-bordered flex items-center gap-2 mt-5 w-[19rem] sm:w-[25rem] md:w-[25rem] lg:w-[25rem]">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            className="h-4 w-4 opacity-70"
-          >
-            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
-          </svg>
           <input
             type="text"
             className="grow"
@@ -111,13 +127,6 @@ function Register() {
         )}
 
         <label className="input input-bordered flex items-center gap-2 mt-5 w-[19rem] sm:w-[25rem] md:w-[25rem] lg:w-[25rem]">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            className="h-4 w-4 opacity-70"
-          >
-            <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793L7.674 8.51c.206.1.446.1.652 0l6.598-3.185V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
-          </svg>
           <input
             type="text"
             className="grow"
@@ -130,16 +139,6 @@ function Register() {
         )}
 
         <label className="input input-bordered flex items-center gap-2 w-[19rem] mt-4 sm:w-[25rem] md:w-[25rem] lg:w-[25rem]">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            className="h-4 w-4 opacity-70"
-          >
-            <path
-              fillRule="evenodd"
-              d="M14 6a4 4 0 1 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2v-2.293l3.955-3.955A4 4 0 1 1 14 6Z"
-            />
-          </svg>
           <input
             type="password"
             className="grow"
@@ -167,11 +166,12 @@ function Register() {
         </div>
       </form>
 
-      {/* Success Pop-up */}
+      {/* Success and Error Pop-ups */}
       <SuccessPopup
         show={successPopup}
         onClose={() => setSuccessPopup(false)}
       />
+      <ErrorPopup show={errorPopup} onClose={() => setErrorPopup(false)} />
     </div>
   );
 }

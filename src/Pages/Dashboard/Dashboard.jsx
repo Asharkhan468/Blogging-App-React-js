@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Cards from "../../components/Cards";
@@ -15,8 +14,6 @@ import {
 import { db, auth } from "../../config/Firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 
-
-
 function Dashboard() {
   const {
     register,
@@ -25,22 +22,18 @@ function Dashboard() {
     formState: { errors },
   } = useForm();
 
-  //user uid
-
-  const [userUid , setUserUid] = useState(null)
-
-  //button text in a state
-
+  // User UID
+  const [userUid, setUserUid] = useState(null);
   const [buttonText, setButtonText] = useState(" Publish Blog");
-
   const currentDate = new Date();
   const month = currentDate.toLocaleString("default", { month: "long" });
   const date = currentDate.getDate();
   const year = currentDate.getFullYear();
-
-  const blogDate = `${month} , ${date}, ${year}`;
-
+  const blogDate = `${month}, ${date}, ${year}`;
   const [cardData, setCardData] = useState([]);
+  const [editData, setEditData] = useState({ title: "", description: "" });
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentEditIndex, setCurrentEditIndex] = useState(null);
 
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
@@ -91,11 +84,10 @@ function Dashboard() {
                 collection(db, "userblogs"),
                 where("uid", "==", uid)
               );
-
               const querySnapshot = await getDocs(q);
               const newData = querySnapshot.docs.map((doc) => doc.data());
               setCardData(newData);
-              console.log(cardData);
+              data.title = "";
               setButtonText(" Publish Blog");
             };
 
@@ -108,76 +100,48 @@ function Dashboard() {
     });
   };
 
-
-  // get updated data
-
- const getUpdatedData = async () => {
-
-   const q = query(
-                collection(db, "userblogs"),
-                where("uid", "==", userUid)
-              );
-
-              const querySnapshot = await getDocs(q);
-              const newData = querySnapshot.docs.map((doc) => doc.data());
-              setCardData(newData);
-
- }
-
-  
-
-
+  // Get updated data
+  const getUpdatedData = async () => {
+    const q = query(collection(db, "userblogs"), where("uid", "==", userUid));
+    const querySnapshot = await getDocs(q);
+    const newData = querySnapshot.docs.map((doc) => doc.data());
+    setCardData(newData);
+  };
 
   const deleteBtn = async (index) => {
     console.log("delete button clicked!", index);
-
     console.log(cardData[index].id);
-
-   
 
     const deleteDataFromFirestore = async () => {
       await deleteDoc(doc(db, "userblogs", cardData[index].id));
-      
     };
-    
-    
-    
-    
-    
-    
-    
-    getUpdatedData()
+
     deleteDataFromFirestore();
-    
-    alert('Blog deleted sucessfully!')
+    getUpdatedData();
+    alert("Blog deleted successfully!");
   };
 
-  //edit blog
+  // Edit blog
+  const editBtn = async (index) => {
+    setEditData({
+      title: cardData[index].title,
+      description: cardData[index].description,
+    });
+    setCurrentEditIndex(index);
+    setIsEditing(true);
+  };
 
-  
-
-  const editBtn = async(index) => {
-
-    const editedTitle = prompt("Enter updated title");
-    const editedDescription = prompt("Enter description");
-
-
-    const washingtonRef = doc(db, "userblogs", cardData[index].id);
+  const handleUpdate = async () => {
+    const washingtonRef = doc(db, "userblogs", cardData[currentEditIndex].id);
     await updateDoc(washingtonRef, {
-  title: editedTitle,
-  description: editedDescription
-});
+      title: editData.title,
+      description: editData.description,
+    });
 
-getUpdatedData()
-
-alert('Blog updated sucessfully!')
-
-
-  }
-
-
- 
-
+    getUpdatedData();
+    setIsEditing(false);
+    alert("Blog updated successfully!");
+  };
 
   return (
     <>
@@ -201,8 +165,7 @@ alert('Blog updated sucessfully!')
         <textarea
           {...register("description", { required: true })}
           placeholder="What's on your mind?"
-          className="textarea textarea-bordered textarea-lg 
-          text-base md:text-lg w-full mb-4"
+          className="textarea textarea-bordered textarea-lg text-base md:text-lg w-full mb-4"
         ></textarea>
         {errors.description && (
           <span className="text-red-600">This field is required</span>
@@ -217,33 +180,248 @@ alert('Blog updated sucessfully!')
 
       <h1 className="text-2xl text-center font-bold mt-[7rem]">My Blogs</h1>
 
-      {cardData ? (
-        cardData.map((item, index) => {
-          return (
-            <div key={index} className="mt-5">
-              <Cards
-                title={item.title}
-                description={item.description}
-                image={item.image}
-                username={item.userName}
-                date={item.date}
-                editBtn={"Edit"}
-                deleteBtn={"delete"}
-                // onEditBtn={editBtn}
-                onDeleteBtn={() => deleteBtn(index)}
-                onEditBtn={() => editBtn(index)}
-              />
-            </div>
-          );
-        })
+      {cardData.length > 0 ? (
+        cardData.map((item, index) => (
+          <div key={index} className="mt-5">
+            <Cards
+              title={item.title}
+              description={item.description}
+              image={item.image}
+              username={item.userName}
+              date={item.date}
+              editBtn="Edit"
+              deleteBtn="Delete"
+              onDeleteBtn={() => deleteBtn(index)}
+              onEditBtn={() => editBtn(index)}
+            />
+          </div>
+        ))
       ) : (
         <h1 className="text-black">No Blog Uploaded</h1>
+      )}
+
+      {/* Edit Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 m-[30vh]">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">Edit Blog</h2>
+            <input
+              type="text"
+              value={editData.title}
+              onChange={(e) =>
+                setEditData({ ...editData, title: e.target.value })
+              }
+              placeholder="Updated title"
+              className="input input-bordered text-base w-full mb-4"
+            />
+            <textarea
+              value={editData.description}
+              onChange={(e) =>
+                setEditData({ ...editData, description: e.target.value })
+              }
+              placeholder="Updated description"
+              className="textarea textarea-bordered text-base w-full mb-4"
+            ></textarea>
+            <div className="flex justify-between">
+              <button
+                onClick={handleUpdate}
+                className="btn btn-primary text-white"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="btn btn-secondary text-white"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
 }
 
 export default Dashboard;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

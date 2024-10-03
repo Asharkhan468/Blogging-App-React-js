@@ -127,23 +127,19 @@ function SingleBlog() {
 
       <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
         {/* Profile Section */}
-        <div className="bg-white shadow-lg rounded-lg w-full max-w-xl p-6 mb-8 text-center">
-          <div className="flex justify-center">
+        <div className="bg-white shadow-lg rounded-lg w-full max-w-md p-6 mb-8 text-center flex justify-center flex-col items-center">
+          <div className="w-32 h-32 border-4 border-indigo-500 rounded-lg overflow-hidden shadow-lg ">
             <img
               src={getData[0].image}
               alt="User Profile"
-              className="w-32 h-32 rounded-full border-4 border-indigo-500"
+              className="w-full h-full object-cover text-center"
             />
           </div>
           <h2 className="text-2xl font-bold mt-4">{getData[0].userName}</h2>
-         
         </div>
-
         {/* User Posts */}
 
-        <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-           Posts
-        </h3>
+        <h3 className="text-2xl font-semibold text-gray-800 mb-4">Posts</h3>
 
         <div className="flex justify-center w-full md:w-3/2 md:ml-6 gap-3 flex-wrap">
           {loading ? (

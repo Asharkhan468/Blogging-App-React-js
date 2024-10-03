@@ -48,12 +48,12 @@ return
         {/* Profile Section */}
 
         {userData && (
-          <div className="bg-white shadow-lg rounded-lg w-full max-w-md p-6 mb-8 text-center">
-            <div className="flex justify-center">
+          <div className="bg-white shadow-lg rounded-lg w-full max-w-md p-6 mb-8 text-center flex justify-center flex-col items-center">
+            <div className="w-32 h-32 border-4 border-indigo-500 rounded-lg overflow-hidden shadow-lg ">
               <img
                 src={userData.profile}
                 alt="User Profile"
-                className="w-32 h-32 rounded-full border-4 border-indigo-500"
+                className="w-full h-full object-cover text-center"
               />
             </div>
             <h2 className="text-2xl font-bold mt-4">{userData.userName}</h2>
